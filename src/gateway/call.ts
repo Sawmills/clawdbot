@@ -62,18 +62,26 @@ export function buildGatewayConnectionDetails(
     typeof options.url === "string" && options.url.trim().length > 0
       ? options.url.trim()
       : undefined;
+  // Support CLAWDBOT_GATEWAY_URL env var for sandbox containers to reach the gateway
+  const envUrl =
+    typeof process.env.CLAWDBOT_GATEWAY_URL === "string" &&
+    process.env.CLAWDBOT_GATEWAY_URL.trim().length > 0
+      ? process.env.CLAWDBOT_GATEWAY_URL.trim()
+      : undefined;
   const remoteUrl =
     typeof remote?.url === "string" && remote.url.trim().length > 0
       ? remote.url.trim()
       : undefined;
-  const url = urlOverride || remoteUrl || localUrl;
+  const url = urlOverride || envUrl || remoteUrl || localUrl;
   const urlSource = urlOverride
     ? "cli --url"
-    : remoteUrl
-      ? "config gateway.remote.url"
-      : preferTailnet && tailnetIPv4
-        ? `local tailnet ${tailnetIPv4}`
-        : "local loopback";
+    : envUrl
+      ? "env CLAWDBOT_GATEWAY_URL"
+      : remoteUrl
+        ? "config gateway.remote.url"
+        : preferTailnet && tailnetIPv4
+          ? `local tailnet ${tailnetIPv4}`
+          : "local loopback";
   const remoteFallbackNote =
     isRemoteMode && !urlOverride && !remoteUrl
       ? "Note: gateway.mode=remote but gateway.remote.url is missing; using local URL."

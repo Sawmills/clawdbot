@@ -736,6 +736,12 @@ export function buildSandboxCreateArgs(params: {
     const formatted = formatUlimitValue(name, value);
     if (formatted) args.push("--ulimit", formatted);
   }
+  // Pass environment variables to the container
+  for (const [key, value] of Object.entries(params.cfg.env ?? {})) {
+    if (key && value !== undefined) {
+      args.push("-e", `${key}=${value}`);
+    }
+  }
   return args;
 }
 

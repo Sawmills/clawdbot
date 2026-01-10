@@ -546,7 +546,9 @@ export function buildEmbeddedSandboxInfo(
   if (!sandbox?.enabled) return undefined;
   return {
     enabled: true,
-    workspaceDir: sandbox.workspaceDir,
+    // Use container workdir (the path the agent sees inside the container)
+    // instead of host workspaceDir which doesn't exist inside the sandbox
+    workspaceDir: sandbox.containerWorkdir,
     workspaceAccess: sandbox.workspaceAccess,
     agentWorkspaceMount:
       sandbox.workspaceAccess === "ro" ? "/agent" : undefined,
